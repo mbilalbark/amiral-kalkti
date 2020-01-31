@@ -1,0 +1,28 @@
+{
+  "name": "amiral-kalkti-server",
+  "version": "1.0.0",
+  "description": "Socket server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mbilalbark/amiral-kalkti.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mbilalbark/amiral-kalkti/issues"
+  },
+  "homepage": "https://github.com/mbilalbark/amiral-kalkti#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
