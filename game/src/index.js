@@ -1,4 +1,7 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js';
+import socket from './socket';
+import './index.css';
+// import './lobby/lobby';
 
 const app = new PIXI.Application({
     width: window.innerWidth,
@@ -10,7 +13,9 @@ document.body.appendChild(app.view)
 const container = new PIXI.Container();
 
 app.stage.addChild(container);
-
+socket.on('room-start', () => {
+    Start();
+});
 
 Start();
 
