@@ -1,42 +1,118 @@
-// Import Application class that is the main part of our PIXI project
-import { Application } from '@pixi/app'
-
-// In order that PIXI could render things we need to register appropriate plugins
-import { Renderer } from '@pixi/core' // Renderer is the class that is going to register plugins
-
-import { BatchRenderer } from '@pixi/core' // BatchRenderer is the "plugin" for drawing sprites
-Renderer.registerPlugin('batch', BatchRenderer)
-
-import { TickerPlugin } from '@pixi/ticker' // TickerPlugin is the plugin for running an update loop (it's for the application class)
-Application.registerPlugin(TickerPlugin)
-
-// And just for convenience let's register Loader plugin in order to use it right from Application instance like app.loader.add(..) etc.
-import { AppLoaderPlugin } from '@pixi/loaders'
-Application.registerPlugin(AppLoaderPlugin)
-
-// Sprite is our image on the stage
-import { Sprite } from '@pixi/sprite'
-
-// App with width and height of the page
-const app = new Application({
-	width: window.innerWidth,
-	height: window.innerHeight
+import * as PIXI from 'pixi.js'
+const app = new PIXI.Application({
+    width: window.innerWidth,
+	height: window.innerHeight,
+	
+   // resolution: window.devicePixelRatio // For good rendering on mobiles
 })
-document.body.appendChild(app.view) // Create Canvas tag in the body
+document.body.appendChild(app.view) 
+var container = new PIXI.Container();
 
-// Load the logo
-app.loader.add('logo', './assets/logo.png')
-app.loader.load(() => {
-	const sprite = Sprite.from('logo')
-	sprite.anchor.set(0.5) // We want to rotate our sprite relative to the center, so 0.5
-	app.stage.addChild(sprite)
+app.stage.addChild(container);
+// var renderer = PIXI.autoDetectRenderer(800, 600);
 
-	// Position the sprite at the center of the stage
-	sprite.x = app.screen.width * 0.5
-	sprite.y = app.screen.height * 0.5
 
-	// Put the rotating function into the update loop
-	app.ticker.add(delta => {
-		sprite.rotation += 0.02 * delta
-	})
-})
+Start();
+
+function Start(){
+
+	const oneShipText = PIXI.Texture.from('assets/1.png');
+	const twoShipText = PIXI.Texture.from('assets/2.png');
+	const threeShipText = PIXI.Texture.from('assets/3.jpeg');
+
+	createShips(50,60, oneShipText);
+	createShips(50,100, twoShipText);
+	createShips(50,200, threeShipText);
+	mapGenerate();
+}
+
+function mapGenerate() {
+	var map = [
+		[50, 50],
+		[50, 60],
+		[50, 70]
+	  ];
+	for(let i = 0; i<map.length;i++){
+		const squareTexture = PIXI.Texture.from('assets/sq.png');
+		const sq = new PIXI.Sprite(squareTexture)
+		sq.position.x = map[i][0];
+		sq.position.y = map[i][1];
+		container.addChild(sq);
+	}
+}
+
+function createShips(x, y,texture)
+{
+    // create our little bunny friend..
+    var ship = new PIXI.Sprite(texture);
+	ship.scale
+    // enable the bunny to be interactive... this will allow it to respond to mouse and touch events
+    ship.interactive = true;
+
+    // this button mode will mean the hand cursor appears when you roll over the bunny with your mouse
+    ship.buttonMode = true;
+
+    // center the bunny's anchor point
+    ship.anchor.set(0.5);
+
+    // make it a bit bigger, so it's easier to grab
+    ship.scale.set(3);
+
+    // setup events
+    ship
+        .on('mousedown', onDragStart)
+        .on('touchstart', onDragStart)
+        .on('mouseup', onDragEnd)
+        .on('mouseupoutside', onDragEnd)
+        .on('touchend', onDragEnd)
+        .on('touchendoutside', onDragEnd)
+        .on('mousemove', onDragMove)
+        .on('touchmove', onDragMove);
+
+    // move the sprite to its designated position
+    ship.position.x = x;
+    ship.position.y = y;
+
+    // add it to the stage
+    container.addChild(ship);
+}
+
+// requestAnimationFrame( animate );
+
+// function animate() {
+
+//     requestAnimationFrame(animate);
+
+//     // render the stage
+//     renderer.render(stage);
+// }
+
+function onDragStart(event)
+{
+    // store a reference to the data
+    // the reason for this is because of multitouch
+    // we want to track the movement of this particular touch
+    this.data = event.data;
+    this.alpha = 0.5;
+    this.dragging = true;
+}
+
+function onDragEnd()
+{
+    this.alpha = 1;
+
+    this.dragging = false;
+
+    // set the interaction data to null
+    this.data = null;
+}
+
+function onDragMove()
+{
+    if (this.dragging)
+    {
+        var newPosition = this.data.getLocalPosition(this.parent);
+        this.position.x = newPosition.x;
+        this.position.y = newPosition.y;
+    }
+}
