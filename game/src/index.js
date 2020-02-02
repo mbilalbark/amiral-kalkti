@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import socket from './socket';
 import './index.css';
+import './modal/modal';
 import './lobby/lobby';
 
 const container = new PIXI.Container();
@@ -17,6 +18,10 @@ let enemyMapSprites = [];
 let currentPlayer = socket.id;
 const readyPlayers = [];
 const arrowSprite = new PIXI.Sprite(PIXI.Texture.from('assets/right-arrow.png'));
+const counter = {
+    enemy : 12,
+    you : 12
+};
 
 socket.on('room-start', () => {
     new Audio('./assets/ocean.wav').play();
@@ -262,6 +267,11 @@ function buttonOut(){
 }
 
 function buttonOnClick(){
+    const droppedShips = allShips.filter(ship => ship.location);
+    if (droppedShips.length !== 4){
+        return;
+    }
+
     socket.emit('ready', socket.id);
     this.alpha = 0;
 }
@@ -270,10 +280,10 @@ function onFire(data) {
     if (data.player !== socket.id){
         let success = false
         allShips.forEach(ship => {
-             if(ship.location[0] === data.target[0]){
-                 if(data.target[1]>= ship.location[1] && data.target[1]<=ship.location[1]+ship.unit)
-                 success = true;
-             }
+                if(ship.location && ship.location[0] === data.target[0]){
+                    if(data.target[1] >= ship.location[1] && data.target[1] <= ship.location[1] + ship.unit)
+                    success = true;
+                }
             })
 
         socket.emit('response', {
@@ -286,7 +296,8 @@ function onFire(data) {
 }
 
 function onResponse(data) {
-    const list = data.player === socket.id ? enemyMapSprites : ownMapSprites;
+    const target = data.player === socket.id ? 'you' : 'enemy';
+    const list = target === 'you' ? enemyMapSprites : ownMapSprites;
     const sprite = list.find(sq => {
         return sq.name && sq.name[0] === data.target[0] && sq.name[1] === data.target[1];
     });
@@ -295,10 +306,18 @@ function onResponse(data) {
         sprite.disabled = true;
         sprite.texture = PIXI.Texture.from('assets/tick.png');
         sprite.alpha = 0.5;
+        counter[target] -= 1;
     } else {
         sprite.disabled = true;
         sprite.texture = PIXI.Texture.from('assets/error.png');
         sprite.alpha = 0.5;
+    }
+
+    if (!counter[target]){
+        const type = target === 'enemy' ? 'success' : 'danger';
+        const modal = document.getElementById(`${type}-modal`);
+        modal.style.display = 'block';
+        return;
     }
 
     currentPlayer = readyPlayers.find(player => player !== currentPlayer);

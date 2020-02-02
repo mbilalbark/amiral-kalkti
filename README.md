@@ -1,9 +1,9 @@
-<center>
+<p align="center">
     <img width="500" src="/game/assets/logo.png">
-    <p>Multiplayer Ship Repair Game</p>
-    <P><strong>#GGJ2020 METU</strong></p>
-    <p>Thanks to <strong>Ferudun Emre Dursun</strong> for intro music!</p>
-</center>
+</p>
+<p align="center">Multiplayer Ship Repair Game</p>
+<P align="center"><strong>#GGJ2020 METU</strong></p>
+<p align="center">Thanks to <strong>Ferudun Emre Dursun && Ercüment Subaşı</strong> for intro music!</p>
 
 
 ### Development
