@@ -61,10 +61,10 @@ function Start(){
     const threeShipText = PIXI.Texture.from('assets/midshiptwo.png');
     const fourShipText = PIXI.Texture.from('assets/smallship.png');
 
-    const ship1 = createShips('ship1', window.innerWidth/2-250 ,100, oneShipText, 200,50);
-    const ship2 = createShips('ship2', window.innerWidth/2-50,100, twoShipText,150,50);
-    const ship3 = createShips('ship3', window.innerWidth/2+120,100, threeShipText,150,50);
-    const ship4 = createShips('ship4', window.innerWidth/2+280,100, fourShipText,100,50);
+    const ship1 = createShips('ship1', window.innerWidth/2-350 ,100, oneShipText, 200,50,3);
+    const ship2 = createShips('ship2', window.innerWidth/2-130,100, twoShipText,150,50,2);
+    const ship3 = createShips('ship3', window.innerWidth/2+40,100, threeShipText,150,50,2);
+    const ship4 = createShips('ship4', window.innerWidth/2+200,100, fourShipText,100,50,1);
 
     allShips = [ship1, ship2, ship3, ship4];
 }
@@ -117,7 +117,7 @@ function generateMap(originalRootX) {
     return sprites;
 }
 
-function createShips(name, x, y, texture, width, height) {
+function createShips(name, x, y, texture, width, height, unit) {
     // create our little bunny friend..
     const ship = new PIXI.Sprite(texture);
 
@@ -128,13 +128,13 @@ function createShips(name, x, y, texture, width, height) {
     ship.buttonMode = true;
 
     // center the bunny's anchor point
-    ship.anchor.set(0.5);
+    ship.anchor.set(0,0.5);
 
     // make it a bit bigger, so it's easier to grab
     ship.height = height;
     ship.width = width;
     ship.name = name;
-
+    ship.unit = unit;
     // setup events
     ship
         .on('mousedown', onDragStart)
@@ -211,11 +211,13 @@ function buttonOnClick(){
 
 function onFire(data) {
     if (data.player !== socket.id){
-        const success = allShips.findIndex(ship => {
-            return ship.location && ship.location[0] === data.target[0] && ship.location[1] === data.target[1];
-        }) > -1;
-
-        console.log(success, data.target, allShips.map(ship => ship.location));
+        let success = false
+        allShips.forEach(ship => {
+             if(ship.location[0] === data.target[0]){
+                 if(data.target[1]>= ship.location[1] && data.target[1]<=ship.location[1]+ship.unit)
+                 success = true;
+             }
+            })
 
         socket.emit('response', {
             player: socket.id,
@@ -257,7 +259,6 @@ function onDragEnd() {
     this.data = null;
 
     this.location = currentTarget;
-
     if (!currentTarget.length){
         this.position.x = this.position.default.x;
         this.position.y = this.position.default.y;
@@ -267,7 +268,7 @@ function onDragEnd() {
 
 function onDragMove(event) {
     if (this.dragging) {
-        var newPosition = this.data.getLocalPosition(this.parent);
+        var newPosition = this.data.getLocalPosition(this.parent);     
         this.position.x = newPosition.x;
         this.position.y = newPosition.y;
     }
