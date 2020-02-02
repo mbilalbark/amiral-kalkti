@@ -1,8 +1,9 @@
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HTMLWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const Dotenv = require('dotenv-webpack')
 
-module.exports = {
+module.exports = (env, argv) => ({
 	devServer: {
 		host : '127.0.0.1',
 		port: 3000
@@ -21,6 +22,9 @@ module.exports = {
 		new HTMLWebpackPlugin({
 			template: 'index.html',
 			filename: 'index.html'
+		}),
+		new Dotenv({
+			path: `./.env.${argv.mode === 'development' ? "dev" : "prod"}`,
 		})
 	],
 	module: {
@@ -43,4 +47,4 @@ module.exports = {
 			}
 		]
 	}
-}
+});
