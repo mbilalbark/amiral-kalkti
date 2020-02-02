@@ -37,18 +37,18 @@ io.on('connection', (socket) => {
 
 
         socket.join(roomName, () => {
-            io.to(roomName).emit('room-start');
+            io.to(roomName).emit('room-start', roomName);
         });
     });
 
-    socket.on('start', () => {
+    socket.on('ready', (socketId) => {
         Object.keys(socket.rooms).forEach(room => {
             const clients = io.sockets.adapter.rooms[room];
             if (!clients || clients.length < 2){
                 return;
             }
 
-            io.to(room).emit('start');
+            io.to(room).emit('ready', socketId);
         });
     });
 
@@ -70,6 +70,7 @@ io.on('connection', (socket) => {
      * {
      *   "player": string,
      *   "room" : string,
+     *   "target" : array // etc [3.5]
      *   "success": boolean
      * }
      * 
