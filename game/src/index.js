@@ -1,35 +1,94 @@
 import * as PIXI from 'pixi.js';
-import socket from './socket';
+// import socket from './socket';
 import './index.css';
 // import './lobby/lobby';
 
 const app = new PIXI.Application({
     width: window.innerWidth,
 	height: window.innerHeight,
-    backgroundColor:16777215	
+    backgroundColor:10010111000011110110110	
 })
 
 document.body.appendChild(app.view) 
 const container = new PIXI.Container();
 
 app.stage.addChild(container);
-socket.on('room-start', () => {
-    Start();
-});
+// socket.on('room-start', () => {
+//     Start();
+// });
 
 Start();
 
 function Start(){
  
-    const oneShipText = PIXI.Texture.from('assets/1.png');
-    const twoShipText = PIXI.Texture.from('assets/2.png');
-    const threeShipText = PIXI.Texture.from('assets/3.jpeg');
-
-    createShips(200,200, oneShipText);
-    createShips(50,100, twoShipText);
-    createShips(50,200, threeShipText);
+    const oneShipText = PIXI.Texture.from('assets/bigship.png');
+    const twoShipText = PIXI.Texture.from('assets/midshipone.png');
+    const threeShipText = PIXI.Texture.from('assets/midshiptwo.png');
+    const fourShipText = PIXI.Texture.from('assets/smallship.png');
+    
+    createShips(window.innerWidth/2-250 ,100, oneShipText, 200,50);
+    createShips(window.innerWidth/2-50,100, twoShipText,150,50);
+    createShips(window.innerWidth/2+120,100, threeShipText,150,50);
+    createShips(window.innerWidth/2+280,100, fourShipText,100,50);
+    buttonCreate()
+    upSideGenerate()
     leftMapGenerate();
     rightMapGenerate(); 
+    logo()
+}
+
+function upSideGenerate() {
+    const leftSideText = PIXI.Texture.from('assets/frame1.png');
+    const sideMap = new PIXI.Sprite(leftSideText)
+    sideMap.height = 100;
+    sideMap.width = 800;
+    sideMap.anchor.set(0.5);
+    sideMap.position.x = window.innerWidth/2;
+    sideMap.position.y = 100;
+    container.addChild(sideMap);
+}
+
+function clickEvent(event) {
+    this.data = event.data;
+    const squareTexture = PIXI.Texture.from('assets/1.png');
+    this.texture = squareTexture
+ 
+}
+
+function buttonCreate() {
+    const readyText = PIXI.Texture.from('assets/ready.png');
+    const readySprite = new PIXI.Sprite(readyText)
+    readySprite.height=100
+    readySprite.width=256
+    readySprite.anchor.set(0.5)
+    readySprite.interactive = true;
+    readySprite.buttonMode = true;
+    readySprite.on('mouseover', buttonHover)
+    readySprite.on('mouseout',buttonOut)
+    readySprite.position.x =  window.innerWidth/2
+    readySprite.position.y = 250
+    container.addChild(readySprite)
+}
+
+function logo() {
+    const logoText = PIXI.Texture.from('assets/logo.png');
+    const logoSprite = new PIXI.Sprite(logoText)
+    logoSprite.anchor.set(0.5)
+    logoSprite.height=150
+    logoSprite.width=250
+    logoSprite.position.x =  window.innerWidth/2
+    logoSprite.position.y = 400
+    container.addChild(logoSprite)
+}
+
+function buttonHover() {
+    const readyHoverText = PIXI.Texture.from('assets/ready-hover.png');
+    this.texture = readyHoverText;
+}
+
+function buttonOut(){
+    const readyText = PIXI.Texture.from('assets/ready.png');
+    this.texture = readyText;
 }
 
 function leftMapGenerate() {
@@ -41,6 +100,9 @@ function leftMapGenerate() {
         for(let j =0;j<10;j++){
             const squareTexture = PIXI.Texture.from('assets/sq.png');
             const sq = new PIXI.Sprite(squareTexture)
+            sq.interactive = true;
+            sq.buttonMode = true;
+            sq.on('click', clickEvent)
             sq.height = 50;
             sq.width = 50;
             sq.position.x = rootX;
@@ -62,6 +124,9 @@ function rightMapGenerate() {
         for(let j =0;j<10;j++){
             const squareTexture = PIXI.Texture.from('assets/sq.png');
             const sq = new PIXI.Sprite(squareTexture)
+            sq.interactive = true;
+            sq.buttonMode = true;
+            sq.on('click', clickEvent)
             sq.height = 50;container
             sq.width = 50;
             sq.position.x = rootX;
@@ -74,11 +139,11 @@ function rightMapGenerate() {
 	}
 }
 
-function createShips(x, y,texture)
+
+function createShips(x, y,texture,width,height)
 {
     // create our little bunny friend..
     var ship = new PIXI.Sprite(texture);
-	ship.scale
     // enable the bunny to be interactive... this will allow it to respond to mouse and touch events
     ship.interactive = true;
 
@@ -89,8 +154,8 @@ function createShips(x, y,texture)
     ship.anchor.set(0.5);
 
     // make it a bit bigger, so it's easier to grab
-    ship.height =80;
-    ship.width = 150;
+    ship.height = height;
+    ship.width  = width;
 
     // setup events
     ship
@@ -109,9 +174,9 @@ function createShips(x, y,texture)
 
     // add it to the stage
     container.addChild(ship);
-    return ship;
+    return ship; this.tint = 11111111
 }
-// Colider
+// Colidera
 function hitTestRectangle(r1, r2) {
 
     //Define the variables we'll need to calculate
@@ -174,7 +239,6 @@ function onDragStart(event)
 function onDragEnd()
 {
     this.alpha = 1;
-
     this.dragging = false;
     this.data = null;
 }
@@ -183,7 +247,6 @@ function onDragMove()
 {
     if (this.dragging)
     {
-        console.log(this.parent)
         var newPosition = this.data.getLocalPosition(this.parent);
         this.position.x = newPosition.x;
         this.position.y = newPosition.y;
