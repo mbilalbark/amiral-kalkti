@@ -89,6 +89,6 @@ io.on('connection', (socket) => {
 });
 
 
-http.listen(port, () => {
+http.listen(process.env.PORT || port, () => {
     console.log(`Server is running on port ${port}`)
 });
