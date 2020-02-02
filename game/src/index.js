@@ -16,6 +16,7 @@ let ownMapSprites = [];
 let enemyMapSprites = [];
 let currentPlayer = socket.id;
 const readyPlayers = [];
+const arrowSprite = new PIXI.Sprite(PIXI.Texture.from('assets/right-arrow.png'));
 
 socket.on('room-start', () => {
     new Audio('./assets/ocean.wav').play();
@@ -30,6 +31,8 @@ socket.on('ready', (player) => {
     }
 
     currentPlayer = readyPlayers[0];
+
+    toggleArrowLabel(currentPlayer === socket.id);
 
     enemyMapSprites = enemyMapSprites.map(sq => {
         sq.interactive = false;
@@ -52,6 +55,9 @@ function Start(){
     buttonCreate();
     upSideGenerate();
     logo();
+    createFireLabel();
+    createArrowLabel();
+    createTitles();
 
     enemyMapSprites = generateMap(200);
     ownMapSprites = generateMap(1150);
@@ -101,10 +107,11 @@ function generateMap(originalRootX) {
                 .on('mouseover', (event) => {
                     currentTarget = sq.name;
                 })
-                // .on('mouseout', (event) => {
-                //     currentTarget = [];
-                //     console.log("mouseout")
-                // });
+                .on('mouseout', (event) => {
+                    if (event.target === null){
+                        currentTarget = [];
+                    }
+                });
 
             sprites.push(sq);
             container.addChild(sq);
@@ -153,7 +160,7 @@ function createShips(name, x, y, texture, width, height, unit) {
 
     // add it to the stage
     container.addChild(ship);
-    return ship; this.tint = 11111111
+    return ship;
 }
 
 function upSideGenerate() {
@@ -192,6 +199,56 @@ function logo() {
     logoSprite.position.x =  window.innerWidth/2
     logoSprite.position.y = 400
     container.addChild(logoSprite)
+}
+
+function createFireLabel(){
+    const fireText = PIXI.Texture.from('assets/fire.png');
+    const fireTextSprite = new PIXI.Sprite(fireText);
+    fireTextSprite.height = 100;
+    fireTextSprite.width = 256;
+    fireTextSprite.anchor.set(0.5)
+    fireTextSprite.position.x =  window.innerWidth / 2;
+    fireTextSprite.position.y = 600;
+    fireTextSprite.alpha = 1;
+    container.addChild(fireTextSprite);
+}
+
+function createArrowLabel(){
+    arrowSprite.height = 100;
+    arrowSprite.width = 256;
+    arrowSprite.anchor.set(0.5)
+    arrowSprite.position.x =  window.innerWidth / 2;
+    arrowSprite.position.y = 700;
+    arrowSprite.alpha = 0;
+    container.addChild(arrowSprite);
+}
+
+function createTitles(){
+    const enemyTitleSprite = new PIXI.Sprite(PIXI.Texture.from('assets/enemy-title.png'));
+    enemyTitleSprite.height = 100;
+    enemyTitleSprite.width = 256;
+    enemyTitleSprite.anchor.set(0.5)
+    enemyTitleSprite.position.x =  300 ;
+    enemyTitleSprite.position.y = 100;
+    container.addChild(enemyTitleSprite);
+
+    const yourTitleSprite = new PIXI.Sprite(PIXI.Texture .from('assets/you-title.png'));
+    yourTitleSprite.height = 100;
+    yourTitleSprite.width = 256;
+    yourTitleSprite.anchor.set(0.5)
+    yourTitleSprite.position.x =  1500;
+    yourTitleSprite.position.y = 100;
+    container.addChild(yourTitleSprite);
+}
+
+function toggleArrowLabel(isCurrentPlayer) {
+    arrowSprite.alpha = 1;
+    arrowSprite.texture = isCurrentPlayer ? PIXI.Texture.from('assets/right-arrow.png') : PIXI.Texture.from('assets/left-arrow.png');
+
+    ownMapSprites = ownMapSprites.map(sq => {
+        sq.interactive = isCurrentPlayer;
+        return sq;
+    });
 }
 
 function buttonHover() {
@@ -245,6 +302,7 @@ function onResponse(data) {
     }
 
     currentPlayer = readyPlayers.find(player => player !== currentPlayer);
+    toggleArrowLabel(socket.id === currentPlayer);
 }
 
 function onDragStart(event) {
